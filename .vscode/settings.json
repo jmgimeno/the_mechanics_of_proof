@@ -17,6 +17,7 @@
     "lean4.infoview.showGoalNames": false,
     "cSpell.words": [
         "addarith",
+        "antisymm",
         "Mathlib"
     ],
 }
