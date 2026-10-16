@@ -20,6 +20,8 @@
         "antisymm",
         "dsimp",
         "Mathlib",
-        "succ"
+        "succ",
+        "symm",
+        "ZMOD"
     ],
 }
