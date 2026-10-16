@@ -4,15 +4,16 @@ import Library.Basic
 
 math2001_init
 
+open Int
 
 example : (11 : ℕ) ∣ 88 := by
-  dsimp [(· ∣ ·)]
+  -- dsimp [(· ∣ ·)]
   use 8
   numbers
 
-
 example : (-2 : ℤ) ∣ 6 := by
-  sorry
+  use -3
+  numbers
 
 example {a b : ℤ} (hab : a ∣ b) : a ∣ b ^ 2 + 2 * b := by
   obtain ⟨k, hk⟩ := hab
@@ -21,20 +22,28 @@ example {a b : ℤ} (hab : a ∣ b) : a ∣ b ^ 2 + 2 * b := by
     b ^ 2 + 2 * b = (a * k) ^ 2 + 2 * (a * k) := by rw [hk]
     _ = a * (k * (a * k + 2)) := by ring
 
-
 example {a b c : ℕ} (hab : a ∣ b) (hbc : b ^ 2 ∣ c) : a ^ 2 ∣ c := by
-  sorry
+  obtain ⟨k, hk⟩ := hab
+  obtain ⟨l, hl⟩ := hbc
+  have H := calc
+    c = b ^ 2 * l := hl
+    _ = (a * k) ^ 2 * l := by rw [hk]
+    _ = a ^ 2 * (k ^ 2 * l) := by ring
+  use k ^ 2 * l
+  exact H
 
 example {x y z : ℕ} (h : x * y ∣ z) : x ∣ z := by
-  sorry
+  obtain ⟨k, hk⟩ := h
+  use y * k
+  rw [hk]
+  ring
 
 example : ¬(5 : ℤ) ∣ 12 := by
-  apply Int.not_dvd_of_exists_lt_and_lt
+  apply not_dvd_of_exists_lt_and_lt
   use 2
   constructor
   · numbers -- show `5 * 2 < 12`
   · numbers -- show `12 < 5 * (2 + 1)`
-
 
 example {a b : ℕ} (hb : 0 < b) (hab : a ∣ b) : a ≤ b := by
   obtain ⟨k, hk⟩ := hab
@@ -43,42 +52,101 @@ example {a b : ℕ} (hb : 0 < b) (hab : a ∣ b) : a ≤ b := by
       0 < b := hb
       _ = a * k := hk
   cancel a at H1
-  have H : 1 ≤ k := H1
+  have H2 : 1 ≤ k := H1
   calc
     a = a * 1 := by ring
-    _ ≤ a * k := by rel [H]
+    _ ≤ a * k := by rel [H2]
     _ = b := by rw [hk]
 
-
 example {a b : ℕ} (hab : a ∣ b) (hb : 0 < b) : 0 < a := by
-  sorry
+  obtain ⟨k, hk⟩ := hab
+  have H :=
+    calc
+      0 < b := hb
+      _ = a * k := hk
+  cancel k at H
 
 /-! # Exercises -/
 
-
 example (t : ℤ) : t ∣ 0 := by
-  sorry
+  use 0
+  ring
 
 example : ¬(3 : ℤ) ∣ -10 := by
-  sorry
+  apply not_dvd_of_exists_lt_and_lt
+  use -4
+  constructor
+  · numbers
+  · numbers
 
 example {x y : ℤ} (h : x ∣ y) : x ∣ 3 * y - 4 * y ^ 2 := by
-  sorry
+  obtain ⟨k, hk⟩ := h
+  have H := calc
+    3 * y - 4 * y ^ 2 = 3 * (x * k) - 4 * (x * k) ^ 2 := by rw [hk]
+    _ = x * (3 * k - 4 * x * k ^ 2) := by ring
+  use 3 * k - 4 * x * k ^ 2
+  exact H
 
 example {m n : ℤ} (h : m ∣ n) : m ∣ 2 * n ^ 3 + n := by
-  sorry
+  obtain ⟨k, hk⟩ := h
+  have H := calc
+    2 * n ^ 3 + n = 2 * (m * k) ^ 3 + (m * k) := by rw [hk]
+    _ = m * (2 * m ^ 2 * k ^ 3 + k) := by ring
+  use 2 * m ^ 2 * k ^ 3 + k
+  exact H
 
 example {a b : ℤ} (hab : a ∣ b) : a ∣ 2 * b ^ 3 - b ^ 2 + 3 * b := by
-  sorry
+  obtain ⟨k, hk⟩ := hab
+  have H := calc
+    2 * b ^ 3 - b ^ 2 + 3 * b = 2 * (a * k) ^ 3 - (a * k) ^ 2 + 3 * (a * k) := by rw [hk]
+    _ = a * (2 * a ^ 2 * k ^ 3 - a * k ^ 2 + 3 * k) := by ring
+  use 2 * a ^ 2 * k ^ 3 - a * k ^ 2 + 3 * k
+  exact H
 
-example {k l m : ℤ} (h1 : k ∣ l) (h2 : l ^ 3 ∣ m) : k ^ 3 ∣ m := by
-  sorry
+example {k l m : ℤ} (h1 : k ∣ l) (H : l ^ 3 ∣ m) : k ^ 3 ∣ m := by
+  obtain ⟨a, ha⟩ := h1
+  obtain ⟨b, hb⟩ := H
+  have H := by calc
+    m = l ^ 3 * b := hb
+    _ = (k * a) ^ 3 * b := by rw [ha]
+    _ = k ^ 3 * (a ^ 3 * b) := by ring
+  use a ^ 3 * b
+  exact H
 
 example {p q r : ℤ} (hpq : p ^ 3 ∣ q) (hqr : q ^ 2 ∣ r) : p ^ 6 ∣ r := by
-  sorry
+  obtain ⟨a, ha⟩ := hpq
+  obtain ⟨b, hb⟩ := hqr
+  have H := calc
+    r = q ^ 2 * b := hb
+    _ = (p ^ 3 * a) ^ 2 * b := by rw [ha]
+    _ = p ^ 6 * (a ^ 2 * b) := by ring
+  use a ^ 2 * b
+  exact H
 
 example : ∃ n : ℕ, 0 < n ∧ 9 ∣ 2 ^ n - 1 := by
-  sorry
+  use 6
+  constructor
+  · numbers
+  · use 7
+    numbers
 
 example : ∃ a b : ℤ, 0 < b ∧ b < a ∧ a - b ∣ a + b := by
-  sorry
+  use 2, 1
+  constructor
+  · numbers
+  · constructor
+    · numbers
+    · use 3
+      numbers
+
+example : ∃ a b : ℤ, 0 < b ∧ b < a ∧ a - b ∣ a + b := by
+  obtain ⟨k, hk⟩ : ∃ k : ℤ, 0 < k := by
+    use 1
+    numbers
+  use k + 1, k
+  constructor
+  · exact hk
+  · constructor
+    · extra
+    · use k + 1 + k
+      ring
