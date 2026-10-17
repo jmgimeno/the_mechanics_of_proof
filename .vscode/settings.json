@@ -19,6 +19,7 @@
         "addarith",
         "antisymm",
         "dsimp",
+        "forall",
         "Mathlib",
         "succ",
         "symm",
