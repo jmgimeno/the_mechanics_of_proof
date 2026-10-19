@@ -20,7 +20,10 @@
         "antisymm",
         "dsimp",
         "forall",
+        "hneg",
+        "hpos",
         "Mathlib",
+        "pyth",
         "succ",
         "symm",
         "ZMOD"
