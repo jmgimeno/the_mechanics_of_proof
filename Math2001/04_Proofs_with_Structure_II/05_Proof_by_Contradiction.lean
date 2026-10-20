@@ -285,10 +285,40 @@ example : ¬ (∃ N : ℕ, ∀ k > N, Nat.Even k) := by
   contradiction
 
 example (n : ℤ) : ¬(n ^ 2 ≡ 2 [ZMOD 4]) := by
-  sorry
+  intro h
+  mod_cases hn : n % 4
+  · have := calc
+      0 = 0 ^ 2 := by numbers
+      _ ≡ n ^ 2 [ZMOD 4] := by rel [hn]
+      _ ≡ 2 [ZMOD 4] := h
+    numbers at this
+  · have := calc
+      1 = 1 ^ 2 := by numbers
+      _ ≡ n ^ 2 [ZMOD 4] := by rel [hn]
+      _ ≡ 2 [ZMOD 4] := h
+    numbers at this
+  · have := calc
+      0 = 2 ^ 2 - 4 * 1 := by numbers
+      _ ≡ n ^ 2 - 4 * 1 [ZMOD 4] := by rel [hn]
+      _ ≡ n ^ 2  [ZMOD 4] := by extra
+      _ ≡ 2 [ZMOD 4] := h
+    numbers at this
+  · have := calc
+      1 = 3 ^ 2 - 4 * 2 := by numbers
+      _ ≡ n ^ 2 - 4 * 2 [ZMOD 4] := by rel [hn]
+      _ ≡ n ^ 2  [ZMOD 4] := by extra
+      _ ≡ 2 [ZMOD 4] := h
+    numbers at this
 
 example : ¬ Prime 1 := by
-  sorry
+  intro ⟨h1, _⟩
+  numbers at h1
 
 example : Prime 97 := by
-  sorry
+  apply better_prime_test (T := 10)
+  · numbers
+  · numbers
+  · intro m hm1 hm2
+    apply Nat.not_dvd_of_exists_lt_and_lt
+    use Nat.div 97 m
+    interval_cases m <;> constructor <;> numbers
