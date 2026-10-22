@@ -231,8 +231,8 @@ example {p : ℕ} (hp : ¬ Prime p) (hp_ge_2 : 2 ≤ p) : ∃ m, 2 ≤ m ∧ m <
       · rw [← hm] at hm_ne_1
         numbers at hm_ne_1
       · apply hm
-    constructor
-    · obtain hm | hm := eq_or_lt_of_le (Nat.le_of_dvd hp_pos hmp)
-      · contradiction
-      · apply hm
-    · apply hmp
+    · constructor
+      · obtain hm | hm := eq_or_lt_of_le (Nat.le_of_dvd hp_pos hmp)
+        · contradiction
+        · apply hm
+      · apply hmp
