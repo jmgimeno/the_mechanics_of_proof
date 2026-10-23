@@ -272,3 +272,9 @@ theorem Nat.even_of_pow_even {a n : ℕ} (ha : Even (a ^ n)) : Even a := by
   · have := Odd.pow h n
     rw [Nat.odd_iff_not_even] at this
     contradiction
+
+example {a n : ℕ} (ha : Even (a ^ n)) : Even a := by
+  rw [Nat.even_iff_not_odd] at *
+  intro h
+  apply ha
+  apply Odd.pow h
