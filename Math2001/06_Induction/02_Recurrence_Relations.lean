@@ -216,7 +216,7 @@ example {n : ℕ} (hn : 2 ≤ n) : Nat.Even (n !) := by
 example (n : ℕ) : (n + 1) ! ≤ (n + 1) ^ n := by
   simple_induction n with k IH
   · rw [factorial, factorial]; numbers
-  · have H : (k + 1) ≤ (k + 1 + 1) := by extra
+  · have H : (k + 1) < (k + 1 + 1) := by extra
     calc
       (k + 1 + 1)! = (k + 1 + 1) * (k + 1)! := by rw [factorial]
       _ ≤ (k + 1 + 1) * (k + 1) ^ k := by rel [IH]
