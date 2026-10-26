@@ -6,17 +6,13 @@ math2001_init
 
 open Nat
 
-
-
 def pascal : ℕ → ℕ → ℕ
   | a, 0 => 1
   | 0, b + 1 => 1
   | a + 1, b + 1 => pascal (a + 1) b + pascal a (b + 1)
 termination_by _ a b => a + b
 
-
 #eval pascal 2 4 -- infoview displays `15`
-
 
 theorem pascal_le (a b : ℕ) : pascal a b ≤ (a + b)! := by
   match a, b with
@@ -36,7 +32,6 @@ theorem pascal_le (a b : ℕ) : pascal a b ≤ (a + b)! := by
         _ = ((a + b + 1) + 1)! := by rw [factorial, factorial, factorial]
         _ = (a + 1 + (b + 1))! := by ring
 termination_by _ a b => a + b
-
 
 theorem pascal_eq (a b : ℕ) : pascal a b * a ! * b ! = (a + b)! := by
   match a, b with
@@ -67,7 +62,6 @@ theorem pascal_eq (a b : ℕ) : pascal a b * a ! * b ! = (a + b)! := by
       _ = ((a + 1) + (b + 1)) ! := by ring
 termination_by _ a b => a + b
 
-
 example (a b : ℕ) : (pascal a b : ℚ) = (a + b)! / (a ! * b !) := by
   have ha := factorial_pos a
   have hb := factorial_pos b
@@ -78,15 +72,37 @@ example (a b : ℕ) : (pascal a b : ℚ) = (a + b)! / (a ! * b !) := by
 
 /-! # Exercises -/
 
-
 theorem pascal_symm (m n : ℕ) : pascal m n = pascal n m := by
   match m, n with
-  | 0, 0 => sorry
-  | a + 1, 0 => sorry
-  | 0, b + 1 => sorry
-  | a + 1, b + 1 => sorry
+  | 0, 0 => rfl
+  | a + 1, 0 => rfl
+  | 0, b + 1 => rfl
+  | a + 1, b + 1 =>
+    have H1 : pascal (a + 1) b = pascal b (a + 1) := pascal_symm (a + 1) b
+    have H2 : pascal a (b + 1) = pascal (b + 1) a := pascal_symm a (b + 1)
+    calc
+      pascal (a + 1) (b + 1) = pascal (a + 1) b + pascal a (b + 1) := by rw [pascal]
+      _ = pascal b (a + 1) + pascal (b + 1) a := by rw [H1, H2]
+      _ = pascal (b + 1) a + pascal b (a + 1) := by ring
+      _ = pascal (b + 1) (a + 1) := by rw [pascal]
 termination_by _ a b => a + b
 
+example (a : ℕ) : pascal a 1 = a + 1 := by
+  simple_induction a with k IH
+  · calc
+      pascal 0 1 = 1 := by rw [pascal]
+      _ = 0 + 1 := by numbers
+  · calc
+      pascal (k + 1) 1 = 1 + pascal k 1 := by rw [pascal, pascal]
+      _ = 1 + (k + 1) := by rw [IH]
+      _ = k + 1 + 1 := by ring
 
 example (a : ℕ) : pascal a 1 = a + 1 := by
-  sorry
+  simple_induction a with k IH
+  · calc
+      pascal 0 1 = 1 := by rw [pascal]
+      _ = 0 + 1 := by numbers
+  · calc
+      pascal (k + 1) 1 = pascal (k + 1) 0 + pascal k 1 := by conv_lhs => rw [pascal]
+      _ = 1 + (k + 1) := by rw [pascal, IH]
+      _ = k + 1 + 1 := by ring
