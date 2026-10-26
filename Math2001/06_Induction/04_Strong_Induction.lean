@@ -6,7 +6,6 @@ math2001_init
 
 open Nat
 
-
 def F : ℕ → ℤ
   | 0 => 1
   | 1 => 1
@@ -27,7 +26,6 @@ theorem F_bound (n : ℕ) : F n ≤ 2 ^ n := by
         _ ≤ 2 ^ (k + 1) + 2 ^ k := by rel [IH1, IH2]
         _ ≤ 2 ^ (k + 1) + 2 ^ k + 2 ^ k := by extra
         _ = 2 ^ (k + 2) := by ring
-
 
 namespace Nat
 
@@ -53,6 +51,21 @@ theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧
 
 /-! # Exercises -/
 
-
 theorem extract_pow_two (n : ℕ) (hn : 0 < n) : ∃ a x, Odd x ∧ n = 2 ^ a * x := by
-  sorry
+  obtain ⟨d, hdn⟩ | hno := even_or_odd n
+  · have hd : 0 < d := by
+      rw [hdn] at hn
+      cancel 2 at hn
+    obtain ⟨a, x, hxo, hdx⟩ := extract_pow_two d hd
+    have := calc
+      n = 2 * d := hdn
+      _ = 2 * (2 ^ a * x) := by rw [hdx]
+      _ = 2 ^ (a + 1) * x := by ring
+    use a + 1, x
+    constructor
+    · apply hxo
+    · apply this
+  · use 0, n
+    constructor
+    · apply hno
+    · ring
