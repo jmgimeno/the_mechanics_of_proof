@@ -6,7 +6,6 @@ math2001_init
 namespace Euclid
 open Int
 
-
 @[decreasing] theorem lower_bound_fmod1 (a b : ℤ) (h1 : 0 < b) : -b < fmod a b := by
   have H : 0 ≤ fmod a b
   · apply fmod_nonneg_of_pos
@@ -41,9 +40,7 @@ def gcd (a b : ℤ) : ℤ :=
     -a
 termination_by _ a b => b
 
-
 #eval gcd (-21) 15 -- infoview displays `3`
-
 
 theorem gcd_nonneg (a b : ℤ) : 0 ≤ gcd a b := by
   rw [gcd]
@@ -60,7 +57,6 @@ theorem gcd_nonneg (a b : ℤ) : 0 ≤ gcd a b := by
     addarith [ha]
 termination_by _ a b => b
 
-
 theorem gcd_dvd (a b : ℤ) : gcd a b ∣ b ∧ gcd a b ∣ a := by
   rw [gcd]
   split_ifs with h1 h2 <;> push_neg at *
@@ -69,31 +65,56 @@ theorem gcd_dvd (a b : ℤ) : gcd a b ∣ b ∧ gcd a b ∣ a := by
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      apply IH_left
     · -- prove that `gcd a b ∣ a`
-      sorry
+      obtain ⟨k, hk⟩ := IH_left
+      obtain ⟨l, hl⟩ := IH_right
+      have H : fmod a b + b * fdiv a b = a := fmod_add_fdiv a b
+      have H' := calc
+        a = fmod a b + b * fdiv a b := by rw [H]
+        _ = gcd b (fmod a b) * l + b * fdiv a b := by rw [← hl]
+        _ = gcd b (fmod a b) * l + gcd b (fmod a b) * k * fdiv a b := by rw [← hk]
+        _ = gcd b (fmod a b) * (l + k * fdiv a b) := by ring
+      use l + k * fdiv a b
+      apply H'
   · -- case `b < 0`
     have IH : _ ∧ _ := gcd_dvd b (fmod a (-b)) -- inductive hypothesis
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      apply IH_left
     · -- prove that `gcd a b ∣ a`
-      sorry
+      obtain ⟨k, hk⟩ := IH_left
+      obtain ⟨l, hl⟩ := IH_right
+      have H : fmod a (-b) + (-b) * fdiv a (-b) = a := fmod_add_fdiv a (-b)
+      have H' := calc
+        a = fmod a (-b) + (-b) * fdiv a (-b) := by rw [H]
+        _ = gcd b (fmod a (-b)) * l + (-b) * fdiv a (-b) := by rw [← hl]
+        _ = gcd b (fmod a (-b)) * l + -(gcd b (fmod a (-b)) * k) * fdiv a (-b) := by rw [← hk]
+        _ = gcd b (fmod a (-b)) * (l - k * fdiv a (-b)) := by ring
+      use l - k * fdiv a (-b)
+      apply H'
   · -- case `b = 0`, `0 ≤ a`
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      have H : b = 0 := le_antisymm h1 h2
+      use 0
+      rw [H]
+      ring
     · -- prove that `gcd a b ∣ a`
-      sorry
+      use 1
+      ring
   · -- case `b = 0`, `a < 0`
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      have H : b = 0 := le_antisymm h1 h2
+      use 0
+      rw [H]
+      ring
     · -- prove that `gcd a b ∣ a`
-      sorry
+      use -1
+      ring
 termination_by gcd_dvd a b => b
-
 
 mutual
 theorem gcd_dvd_right (a b : ℤ) : gcd a b ∣ b := by
@@ -147,13 +168,10 @@ theorem gcd_dvd_left (a b : ℤ) : gcd a b ∣ a := by
   · -- case `b = 0`, `a < 0`
     use -1
     ring
-
 end
 termination_by gcd_dvd_right a b => b ; gcd_dvd_left a b => b
 
-
 mutual
-
 def L (a b : ℤ) : ℤ :=
   if 0 < b then
     R b (fmod a b)
@@ -171,14 +189,11 @@ def R (a b : ℤ) : ℤ :=
     L b (fmod a (-b)) + (fdiv a (-b)) * R b (fmod a (-b))
   else
     0
-
 end
 termination_by L a b => b ; R a b => b
 
-
 #eval L (-21) 15 -- infoview displays `2`
 #eval R (-21) 15 -- infoview displays `3`
-
 
 theorem L_mul_add_R_mul (a b : ℤ) : L a b * a + R a b * b = gcd a b := by
   rw [R, L, gcd]
@@ -207,18 +222,15 @@ theorem L_mul_add_R_mul (a b : ℤ) : L a b * a + R a b * b = gcd a b := by
     ring
 termination_by L_mul_add_R_mul a b => b
 
-
 #eval L 7 5 -- infoview displays `-2`
 #eval R 7 5 -- infoview displays `3`
 #eval gcd 7 5 -- infoview displays `1`
-
 
 theorem bezout (a b : ℤ) : ∃ x y : ℤ, x * a + y * b = gcd a b := by
   use L a b, R a b
   apply L_mul_add_R_mul
 
 /-! # Exercises -/
-
 
 theorem gcd_maximal {d a b : ℤ} (ha : d ∣ a) (hb : d ∣ b) : d ∣ gcd a b := by
   sorry
