@@ -233,4 +233,12 @@ theorem bezout (a b : ℤ) : ∃ x y : ℤ, x * a + y * b = gcd a b := by
 /-! # Exercises -/
 
 theorem gcd_maximal {d a b : ℤ} (ha : d ∣ a) (hb : d ∣ b) : d ∣ gcd a b := by
-  sorry
+  obtain ⟨x, y, hxy⟩ := bezout a b
+  obtain ⟨k, hk⟩ := ha
+  obtain ⟨l, hl⟩ := hb
+  have := calc
+    gcd a b = x * a + y * b := by rw [hxy]
+    _ = x * (d * k) + y * (d * l) := by rw [hk, hl]
+    _ = d * (x * k + y * l) := by ring
+  use x * k + y * l
+  apply this

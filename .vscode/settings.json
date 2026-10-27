@@ -27,6 +27,7 @@
         "hfact",
         "hneg",
         "hpos",
+        "infoview",
         "Mathlib",
         "nonneg",
         "nonpos",
