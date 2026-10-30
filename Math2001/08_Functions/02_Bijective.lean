@@ -7,7 +7,6 @@ math2001_init
 
 open Function
 
-
 def p (x : ℝ) : ℝ := 2 * x - 5
 
 example : Bijective p := by
@@ -25,8 +24,6 @@ example : Bijective p := by
     calc p ((y + 5) / 2) = 2 * ((y + 5) / 2) - 5 := by rfl
       _ = y := by ring
 
-
-
 def a (t : ℝ) : ℝ := t ^ 3 - t
 
 example : ¬ Bijective a := by
@@ -42,7 +39,6 @@ example : ¬ Bijective a := by
       _ = a 1 := by rfl
   · numbers
 
-
 inductive Celestial
   | sun
   | moon
@@ -56,11 +52,9 @@ inductive Subatomic
 
 open Celestial Subatomic
 
-
 def f : Celestial → Subatomic
   | sun => proton
   | moon => electron
-
 
 example : ¬ Bijective f := by
   dsimp [Bijective]
@@ -71,7 +65,6 @@ example : ¬ Bijective f := by
   use neutron
   intro x
   cases x <;> exhaust
-
 
 example {f : X → Y} : Bijective f ↔ ∀ y, ∃! x, f x = y := by
   constructor
@@ -107,7 +100,6 @@ example {f : X → Y} : Bijective f ↔ ∀ y, ∃! x, f x = y := by
       use x
       apply hx
 
-
 example : ∀ f : Celestial → Celestial, Injective f → Bijective f := by
   intro f hf
   constructor
@@ -127,9 +119,18 @@ example : ∀ f : Celestial → Celestial, Injective f → Bijective f := by
       apply h_sun
     · use moon
       apply h_moon
-  | moon, sun => sorry
-  | moon, moon => sorry
-
+  | moon, sun =>
+    intro y
+    cases y
+    · use moon
+      apply h_moon
+    · use sun
+      apply h_sun
+  | moon, moon =>
+    have : sun = moon
+    · apply hf
+      rw [h_sun, h_moon]
+    contradiction
 
 example : ¬ ∀ f : ℕ → ℕ, Injective f → Bijective f := by
   push_neg
@@ -152,19 +153,34 @@ example : ¬ ∀ f : ℕ → ℕ, Injective f → Bijective f := by
 
 /-! # Exercises -/
 
-
 example : Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
-  sorry
+  constructor
+  · -- injective
+    dsimp [Injective]
+    intro x1 x2 hx1x2
+    calc
+      x1 = 4 / 3 - (4 - 3 * x1) / 3 := by ring
+      _  = 4 / 3 - (4 - 3 * x2) / 3 := by rw [hx1x2]
+      _ = x2 := by ring
+  · -- surjective
+    intro y
+    use (4 - y) / 3
+    ring
 
-example : ¬ Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
-  sorry
+-- example : ¬ Bijective (fun (x : ℝ) ↦ 4 - 3 * x) := by
+--   sorry
 
-
-example : Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
-  sorry
+-- example : Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
+--   sorry
 
 example : ¬ Bijective (fun (x : ℝ) ↦ x ^ 2 + 2 * x) := by
-  sorry
+  dsimp [Bijective]
+  push_neg
+  left
+  dsimp [Injective]
+  push_neg
+  use 0, -2
+  constructor <;> numbers
 
 inductive Element
   | fire
@@ -182,15 +198,154 @@ def e : Element → Element
   | air => water
 
 example : Bijective e := by
-  sorry
+  constructor
+  · dsimp [Injective]
+    intro x1 x2 hx1x2
+    cases x1 <;> cases x2 <;> exhaust
+  · dsimp [Surjective]
+    intro y
+    cases y
+    · use earth ; rfl
+    · use air ; rfl
+    · use fire ; rfl
+    · use water ; rfl
 
-example : ¬ Bijective e := by
-  sorry
+example : Bijective e := by
+  constructor
+  · intro x1 x2 hx1x2
+    cases x1 <;> cases x2 <;> exhaust
+  · intro y
+    use e y -- e its is own inverse !!
+    cases y <;> rfl
 
+example : Bijective e := by
+  apply Involutive.bijective -- e is involutive: e (e x) = x and involutives are bijective
+  intro x
+  cases x <;> rfl
+
+-- example : ¬ Bijective e := by
+--   sorry
 
 example : ∀ f : Subatomic → Subatomic, Injective f → Bijective f := by
-  sorry
+  intro f hf
+  constructor
+  · apply hf
+  · dsimp [Surjective]
+    intro y
+    cases y
+    · cases h1 : f proton
+      · use proton ; apply h1
+      · cases h2 : f neutron
+        · use neutron ; apply h2
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+        · cases h3 : f electron
+          · use electron ; apply h3
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+      · cases h2 : f neutron
+        · use neutron ; apply h2
+        · cases h3 : f electron
+          · use electron ; apply h3
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+    · cases h1 : f proton
+      · cases h2 : f neutron
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+        · use neutron ; apply h2
+        · cases h3 : f electron
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+          · use electron ; apply h3
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+      · use proton ; apply h1
+      · cases h2 : f neutron
+        · cases h3 : f electron
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+          · use electron ; apply h3
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+        · use neutron ; apply h2
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+    · cases h1 : f proton
+      · cases h2 : f neutron
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+        · cases h3 : f electron
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+          · use electron ; apply h3
+        · use neutron ; apply h2
+      · cases h2 : f neutron
+        · cases h3 : f electron
+          · have hEx : f neutron = f electron := by rw [h2, h3]
+            have : neutron = electron := hf hEx
+            contradiction
+          · have hEx : f proton = f electron := by rw [h1, h3]
+            have : proton = electron := hf hEx
+            contradiction
+          · use electron ; apply h3
+        · have hEx : f proton = f neutron := by rw [h1, h2]
+          have : proton = neutron := hf hEx
+          contradiction
+        · use neutron ; apply h2
+      · use proton ; apply h1
 
+example : ∀ f : Subatomic → Subatomic, Injective f → Bijective f := by
+  intro f hf
+  constructor
+  · apply hf
+  · intro y
+    cases h1 : f proton <;> cases h2 : f neutron <;> cases h3 : f electron <;> cases y <;>
+    first
+    | exact ⟨proton, h1⟩
+    | exact ⟨neutron, h2⟩
+    | exact ⟨electron, h3⟩
+    | (have := hf (h1.trans h2.symm); contradiction)
+    | (have := hf (h1.trans h3.symm); contradiction)
+    | (have := hf (h2.trans h3.symm); contradiction)
 
 example : ∀ f : Element → Element, Injective f → Bijective f := by
-  sorry
+  intro f hf
+  constructor
+  · apply hf
+  · intro y
+    cases h1 : f fire <;> cases h2 : f water <;> cases h3 : f earth <;> cases h4 : f air <;> cases y <;>
+    first
+    | exact ⟨fire, h1⟩
+    | exact ⟨water, h2⟩
+    | exact ⟨earth, h3⟩
+    | exact ⟨air, h4⟩
+    | (have := hf (h1.trans h2.symm); contradiction)
+    | (have := hf (h1.trans h3.symm); contradiction)
+    | (have := hf (h1.trans h4.symm); contradiction)
+    | (have := hf (h2.trans h3.symm); contradiction)
+    | (have := hf (h2.trans h4.symm); contradiction)
+    | (have := hf (h3.trans h4.symm); contradiction)
