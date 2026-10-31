@@ -37,6 +37,7 @@
         "involutive",
         "Involutive",
         "Mathlib",
+        "noncomputable",
         "nonneg",
         "nonpos",
         "porthos",

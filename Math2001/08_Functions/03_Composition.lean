@@ -8,7 +8,6 @@ set_option pp.funBinderTypes true
 
 open Function
 
-
 def f (a : ℝ) : ℝ := a + 3
 def g (b : ℝ) : ℝ := 2 * b
 def h (c : ℝ) : ℝ := 2 * c + 6
@@ -20,7 +19,6 @@ example : g ∘ f = h := by
     _ = 2 * x + 6 := by ring
     _ = h x := by rfl
 
-
 def s (x : ℝ) : ℝ := 5 - x
 
 example : s ∘ s = id := by
@@ -28,9 +26,7 @@ example : s ∘ s = id := by
   dsimp [s]
   ring
 
-
 def Inverse (f : X → Y) (g : Y → X) : Prop := g ∘ f = id ∧ f ∘ g = id
-
 
 inductive Humour
   | melancholic
@@ -41,13 +37,11 @@ inductive Humour
 
 open Humour
 
-
 def p : Humour → Humour
   | melancholic => choleric
   | choleric => sanguine
   | phlegmatic => phlegmatic
   | sanguine => melancholic
-
 
 def q : Humour → Humour
   | melancholic => sanguine
@@ -61,7 +55,6 @@ example : Inverse p q := by
     cases x <;> exhaust
   · ext x
     cases x <;> exhaust
-
 
 theorem exists_inverse_of_bijective {f : X → Y} (hf : Bijective f) :
     ∃ g : Y → X, Inverse f g := by
@@ -82,7 +75,6 @@ theorem exists_inverse_of_bijective {f : X → Y} (hf : Bijective f) :
   · -- prove `f ∘ g = id`
     ext y
     apply hg
-
 
 theorem bijective_of_inverse {f : X → Y} {g : Y → X} (h : Inverse f g) :
     Bijective f := by
@@ -105,7 +97,6 @@ theorem bijective_of_inverse {f : X → Y} {g : Y → X} (h : Inverse f g) :
       _ = id y := by rw [hfg]
       _ = y := by rfl
 
-
 theorem bijective_iff_exists_inverse (f : X → Y) :
     Bijective f ↔ ∃ g : Y → X, Inverse f g := by
   constructor
@@ -114,9 +105,7 @@ theorem bijective_iff_exists_inverse (f : X → Y) :
     obtain ⟨g, H⟩ := h
     apply bijective_of_inverse H
 
-
 /-! # Exercises -/
-
 
 def a : Humour → Humour
   | melancholic => sanguine
@@ -131,37 +120,95 @@ def b : Humour → Humour
   | sanguine => sanguine
 
 def c : Humour → Humour
-  | melancholic => sorry
-  | choleric => sorry
-  | phlegmatic => sorry
-  | sanguine => sorry
+  | melancholic => sanguine
+  | choleric => phlegmatic
+  | phlegmatic => melancholic
+  | sanguine => phlegmatic
 
 example : b ∘ a = c := by
   ext x
   cases x <;> exhaust
 
-
 def u (x : ℝ) : ℝ := 5 * x + 1
 
-noncomputable def v (x : ℝ) : ℝ := sorry
+noncomputable def v (x : ℝ) : ℝ := (x - 1) / 5
 
 example : Inverse u v := by
-  sorry
+  dsimp [Inverse]
+  constructor
+  · ext x
+    calc
+      (v ∘ u) x = v (u x) := by rfl
+      _ = ((5 * x + 1) - 1) / 5 := by rfl
+      _ = x := by ring
+      _ = id x := by rfl
+  · ext x
+    calc
+      (u ∘ v) x = u (v x) := by rfl
+      _ = 5 * ((x - 1) / 5) + 1 := by rfl
+      _ = x := by ring
+      _ = id x := by rfl
 
 example {f : X → Y} (hf : Injective f) {g : Y → Z} (hg : Injective g) :
     Injective (g ∘ f) := by
-  sorry
+  intro _ _ hgf
+  apply hf (hg hgf)
 
 example {f : X → Y} (hf : Surjective f) {g : Y → Z} (hg : Surjective g) :
     Surjective (g ∘ f) := by
-  sorry
+  intro z
+  obtain ⟨y, hgy⟩ := hg z
+  obtain ⟨x, hfx⟩ := hf y
+  use x
+  calc
+    g (f x) = g y := by rw [hfx]
+    _ = z := by rw [hgy]
+
+example {f : X → Y} (hf : Surjective f) {g : Y → Z} (hg : Surjective g) :
+    Surjective (g ∘ f) := by
+  intro z
+  obtain ⟨y, rfl⟩ := hg z
+  obtain ⟨x, rfl⟩ := hf y
+  use x
+  rfl
 
 example {f : X → Y} (hf : Surjective f) : ∃ g : Y → X, f ∘ g = id := by
-  sorry
+  choose g hg using hf
+  use g
+  ext x
+  calc
+    (f ∘ g) x = f (g x) := by rfl
+    _ = x := by rw [hg]
+    _ = id x := by rfl
 
 example {f : X → Y} {g : Y → X} (h : Inverse f g) : Inverse g f := by
-  sorry
+  obtain ⟨hgf, hfg⟩ := h
+  constructor
+  · apply hfg
+  · apply hgf
+
+example {f : X → Y} {g : Y → X} (h : Inverse f g) : Inverse g f := by
+  obtain ⟨hgf, hfg⟩ := h
+  exact ⟨hfg, hgf⟩
 
 example {f : X → Y} {g1 g2 : Y → X} (h1 : Inverse f g1) (h2 : Inverse f g2) :
     g1 = g2 := by
-  sorry
+  obtain ⟨hg1f, _⟩ := h1
+  obtain ⟨_, hfg2⟩ := h2
+  ext y
+  calc
+    g1 y = g1 (id y) := by rfl
+    _ = g1 ((f ∘ g2) y) := by rw [hfg2]
+    _ = g1 (f (g2 y)) := by rfl
+    _ = (g1 ∘ f) (g2 y) := by rfl
+    _ = id (g2 y) := by rw [hg1f]
+    _ = g2 y := by rfl
+
+example {f : X → Y} {g1 g2 : Y → X} (h1 : Inverse f g1) (h2 : Inverse f g2) :
+    g1 = g2 := by
+  obtain ⟨hg1f, _⟩ := h1
+  obtain ⟨_, hfg2⟩ := h2
+  calc
+    g1 = g1 ∘ (f ∘ g2) := by rw [hfg2]; rfl
+    _ = (g1 ∘ f) ∘ g2 := by rfl
+    _ = g2 := by rw [hg1f]; rfl
