@@ -7,14 +7,11 @@ math2001_init
 
 open Set
 
-
 #check {n : ℤ | n ≤ 3}
-
 
 example : 1 ∈ {n : ℤ | n ≤ 3} := by
   dsimp
   numbers
-
 
 namespace Nat
 example : 10 ∉ {n : ℕ | Odd n} := by
@@ -24,7 +21,6 @@ example : 10 ∉ {n : ℕ | Odd n} := by
   numbers
 end Nat
 
-
 example : {a : ℕ | 4 ∣ a} ⊆ {b : ℕ | 2 ∣ b} := by
   dsimp [Set.subset_def] -- optional
   intro a ha
@@ -33,7 +29,6 @@ example : {a : ℕ | 4 ∣ a} ⊆ {b : ℕ | 2 ∣ b} := by
   calc a = 4 * k := hk
     _ = 2 * (2 * k) := by ring
 
-
 example : {x : ℝ | 0 ≤ x ^ 2} ⊈ {t : ℝ | 0 ≤ t} := by
   dsimp [Set.subset_def]
   push_neg
@@ -41,7 +36,6 @@ example : {x : ℝ | 0 ≤ x ^ 2} ⊈ {t : ℝ | 0 ≤ t} := by
   constructor
   · numbers
   · numbers
-
 
 example : {x : ℤ | Int.Odd x} = {a : ℤ | ∃ k, a = 2 * k - 1} := by
   ext x
@@ -58,7 +52,6 @@ example : {x : ℤ | Int.Odd x} = {a : ℤ | ∃ k, a = 2 * k - 1} := by
     calc x = 2 * k - 1 := by rw [hk]
       _ = 2 * (k - 1) + 1 := by ring
 
-
 example : {a : ℕ | 4 ∣ a} ≠ {b : ℕ | 2 ∣ b} := by
   ext
   dsimp
@@ -71,7 +64,6 @@ example : {a : ℕ | 4 ∣ a} ≠ {b : ℕ | 2 ∣ b} := by
     constructor <;> numbers
   · use 3
     numbers
-
 
 example : {k : ℤ | 8 ∣ 5 * k} = {l : ℤ | 8 ∣ l} := by
   ext n
@@ -89,7 +81,6 @@ example : {k : ℤ | 8 ∣ 5 * k} = {l : ℤ | 8 ∣ l} := by
     use 5 * a
     calc 5 * n = 5 * (8 * a) := by rw [ha]
       _ = 8 * (5 * a) := by ring
-
 
 example : {x : ℝ | x ^ 2 - x - 2 = 0} = {-1, 2} := by
   ext x
@@ -113,7 +104,6 @@ example : {x : ℝ | x ^ 2 - x - 2 = 0} = {-1, 2} := by
     · calc x ^ 2 - x - 2 = 2 ^ 2 - 2 - 2 := by rw [h]
         _ = 0 := by numbers
 
-
 example : {1, 3, 6} ⊆ {t : ℚ | t < 10} := by
   dsimp [Set.subset_def]
   intro t ht
@@ -124,99 +114,195 @@ example : {1, 3, 6} ⊆ {t : ℚ | t < 10} := by
 
 /-! # Exercises -/
 
-
-example : 4 ∈ {a : ℚ | a < 3} := by
-  sorry
+-- example : 4 ∈ {a : ℚ | a < 3} := by
+--   sorry
 
 example : 4 ∉ {a : ℚ | a < 3} := by
-  sorry
+  dsimp
+  numbers
 
 example : 6 ∈ {n : ℕ | n ∣ 42} := by
-  sorry
+  dsimp
+  use 7
+  numbers
 
-example : 6 ∉ {n : ℕ | n ∣ 42} := by
-  sorry
+-- example : 6 ∉ {n : ℕ | n ∣ 42} := by
+--   sorry
 
-
-example : 8 ∈ {k : ℤ | 5 ∣ k} := by
-  sorry
+-- example : 8 ∈ {k : ℤ | 5 ∣ k} := by
+--   sorry
 
 example : 8 ∉ {k : ℤ | 5 ∣ k} := by
-  sorry
+  dsimp
+  apply Int.not_dvd_of_exists_lt_and_lt
+  use 1
+  constructor <;> numbers
 
 example : 11 ∈ {n : ℕ | Odd n} := by
-  sorry
+  dsimp
+  use 5
+  numbers
 
-example : 11 ∉ {n : ℕ | Odd n} := by
-  sorry
-
+-- example : 11 ∉ {n : ℕ | Odd n} := by
+--   sorry
 
 example : -3 ∈ {x : ℝ | ∀ y : ℝ, x ≤ y ^ 2} := by
-  sorry
+  dsimp
+  intro y
+  calc
+    -3 ≤ 0 := by numbers
+    _ ≤ y ^ 2 := by extra
 
-example : -3 ∉ {x : ℝ | ∀ y : ℝ, x ≤ y ^ 2} := by
-  sorry
-
+-- example : -3 ∉ {x : ℝ | ∀ y : ℝ, x ≤ y ^ 2} := by
+--   sorry
 
 example : {a : ℕ | 20 ∣ a} ⊆ {x : ℕ | 5 ∣ x} := by
-  sorry
+  dsimp [Set.subset_def]
+  intro x hx
+  obtain ⟨k, hk⟩ := hx
+  use 4 * k
+  calc
+    x = 20 * k := hk
+    _ = 5 * (4 * k) := by ring
 
-example : {a : ℕ | 20 ∣ a} ⊈ {x : ℕ | 5 ∣ x} := by
-  sorry
+-- example : {a : ℕ | 20 ∣ a} ⊈ {x : ℕ | 5 ∣ x} := by
+--   sorry
 
-
-example : {a : ℕ | 5 ∣ a} ⊆ {x : ℕ | 20 ∣ x} := by
-  sorry
+-- example : {a : ℕ | 5 ∣ a} ⊆ {x : ℕ | 20 ∣ x} := by
+--   sorry
 
 example : {a : ℕ | 5 ∣ a} ⊈ {x : ℕ | 20 ∣ x} := by
-  sorry
+  dsimp [Set.subset_def]
+  push_neg
+  use 5
+  constructor
+  · use 1 ; numbers
+  · apply Nat.not_dvd_of_exists_lt_and_lt
+    use 0
+    constructor <;> numbers
 
-example : {r : ℤ | 3 ∣ r} ⊆ {s : ℤ | 0 ≤ s} := by
-  sorry
+-- example : {r : ℤ | 3 ∣ r} ⊆ {s : ℤ | 0 ≤ s} := by
+--   sorry
 
 example : {r : ℤ | 3 ∣ r} ⊈ {s : ℤ | 0 ≤ s} := by
-  sorry
+  dsimp [Set.subset_def]
+  push_neg
+  use -3
+  constructor
+  · use -1
+    numbers
+  · numbers
 
 example : {m : ℤ | m ≥ 10} ⊆ {n : ℤ | n ^ 3 - 7 * n ^ 2 ≥ 4 * n} := by
-  sorry
+  dsimp [Set.subset_def]
+  intro n hn
+  calc
+    n ^ 3 - 7 * n ^ 2 = n * n ^ 2 - 7 * n ^ 2 := by ring
+    _ ≥ 10 * n ^ 2 - 7 * n ^ 2 := by rel [hn]
+    _ = 3 * n * n := by ring
+    _ ≥ 3 * 10 * n := by rel [hn]
+    _ = 4 * n + 26 * n := by ring
+    _ ≥ 4 * n := by extra
 
-example : {m : ℤ | m ≥ 10} ⊈ {n : ℤ | n ^ 3 - 7 * n ^ 2 ≥ 4 * n} := by
-  sorry
-
+-- example : {m : ℤ | m ≥ 10} ⊈ {n : ℤ | n ^ 3 - 7 * n ^ 2 ≥ 4 * n} := by
+--   sorry
 
 namespace Int
 example : {n : ℤ | Even n} = {a : ℤ | a ≡ 6 [ZMOD 2]} := by
-  sorry
+  ext n
+  dsimp
+  constructor
+  · intro ⟨k, hk⟩
+    calc
+      n = 2 * k := hk
+      _ = 2 * (k - 3) + 6 := by ring
+      _ ≡ 6 [ZMOD 2] := by extra
+  · intro ⟨k, hk⟩
+    have := calc
+      n = n - 6 + 6 := by ring
+      _ = 2 * k + 6 := by rw [hk]
+      _ = 2 * (k + 3) := by ring
+    use k + 3
+    apply this
 
-example : {n : ℤ | Even n} ≠ {a : ℤ | a ≡ 6 [ZMOD 2]} := by
-  sorry
+-- example : {n : ℤ | Even n} ≠ {a : ℤ | a ≡ 6 [ZMOD 2]} := by
+--   sorry
 end Int
 
 
-example : {t : ℝ | t ^ 2 - 5 * t + 4 = 0} = {4} := by
-  sorry
+-- example : {t : ℝ | t ^ 2 - 5 * t + 4 = 0} = {4} := by
+--   sorry
 
 example : {t : ℝ | t ^ 2 - 5 * t + 4 = 0} ≠ {4} := by
-  sorry
+  ext
+  push_neg
+  use 1
+  dsimp
+  left
+  constructor <;> numbers
 
-example : {k : ℤ | 8 ∣ 6 * k} = {l : ℤ | 8 ∣ l} := by
-  sorry
+-- example : {k : ℤ | 8 ∣ 6 * k} = {l : ℤ | 8 ∣ l} := by
+--   sorry
 
 example : {k : ℤ | 8 ∣ 6 * k} ≠ {l : ℤ | 8 ∣ l} := by
-  sorry
+  ext
+  push_neg
+  use 4
+  dsimp
+  left
+  constructor
+  · use 3 ; numbers
+  · apply Int.not_dvd_of_exists_lt_and_lt
+    use 0
+    constructor <;> numbers
 
 example : {k : ℤ | 7 ∣ 9 * k} = {l : ℤ | 7 ∣ l} := by
-  sorry
+  ext k
+  dsimp
+  constructor
+  · intro ⟨x, hx⟩
+    have := calc
+      k = 4 * (9 * k) - 35 * k := by ring
+      _ = 4 * (7 * x) - 35 * k := by rw [hx]
+      _ = 7 * (4 * x - 5 * k) := by ring
+    use 4 * x - 5 * k
+    apply this
+  · intro ⟨x, hx⟩
+    have := calc
+      9 * k = 9 * (7 * x) := by rw [hx]
+      _ = 7 * (9 * x) := by ring
+    use 9 * x
+    apply this
 
-example : {k : ℤ | 7 ∣ 9 * k} ≠ {l : ℤ | 7 ∣ l} := by
-  sorry
+-- example : {k : ℤ | 7 ∣ 9 * k} ≠ {l : ℤ | 7 ∣ l} := by
+--   sorry
 
-
-example : {1, 2, 3} = {1, 2} := by
-  sorry
+-- example : {1, 2, 3} = {1, 2} := by
+--   sorry
 
 example : {1, 2, 3} ≠ {1, 2} := by
-  sorry
+  ext
+  push_neg
+  use 3
+  left
+  constructor
+  · dsimp
+    right ; right ; numbers
+  · dsimp
+    push_neg
+    constructor <;> numbers
 
 example : {x : ℝ | x ^ 2 + 3 * x + 2 = 0} = {-1, -2} := by
-  sorry
+  ext x
+  dsimp
+  constructor
+  · intro h
+    have h1 := calc
+      (x + 1) * (x + 2) = x ^ 2 + 3 * x + 2 := by ring
+      _ = 0 := h
+    obtain hx | hx := eq_zero_or_eq_zero_of_mul_eq_zero h1
+    · left
+      addarith [hx]
+    · right
+      addarith [hx]
+  · rintro (hx | hx) <;> rw [hx] <;> numbers
