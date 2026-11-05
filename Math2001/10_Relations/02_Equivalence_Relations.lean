@@ -168,14 +168,39 @@ section
 local infix:50 "∼" => fun (a b : ℤ) ↦ ∃ m n, m > 0 ∧ n > 0 ∧ a * m = b * n
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro a
+  use 1, 1
+  constructor
+  · numbers
+  · constructor
+    · numbers
+    · ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y ⟨m, n, hm, hn, hmn⟩
+  use n, m
+  constructor
+  · apply hn
+  · constructor
+    · apply hm
+    · rw [hmn]
 
 example : Transitive (· ∼ ·) := by
-  sorry
-
+  dsimp [Transitive]
+  intro x y z ⟨m1, n1, hm1, hn1, hmn1⟩ ⟨m2, n2, hm2, hn2, hmn2⟩
+  use m1 * m2, n1 * n2
+  constructor
+  · extra
+  · constructor
+    · extra
+    · calc
+        x * (m1 * m2) = (x * m1) * m2 := by ring
+        _ = (y * n1) * m2 := by rw [hmn1]
+        _ = (y * m2) * n1 := by ring
+        _ = (z * n2) * n1 := by rw [hmn2]
+        _ = z * (n1 * n2) := by ring
 end
 
 
@@ -183,28 +208,70 @@ section
 local infix:50 "∼" => fun ((a, b) : ℕ × ℕ) (c, d) ↦ a + d = b + c
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro (x, y)
+  dsimp
+  ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro (x1, y1) (x2, y2) h12
+  calc
+    x2 + y1 = y1 + x2 := by ring
+    _ = x1 + y2 := by rw [h12]
+    _ = y2 + x1 := by ring
+
+example : Symmetric (· ∼ ·) := by
+  dsimp [Symmetric]
+  intro (x1, y1) (x2, y2) h12
+  addarith [h12]
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro x y z hxy hyz
+  have := calc
+    x.1 + z.2 + (y.1 + y.2) = (x.1 + y.2) + (y.1 + z.2) := by ring
+    _ = (x.2 + y.1) + (y.2 + z.1) := by rw [hxy, hyz]
+    _ = x.2 + z.1 + (y.1 + y.2) := by ring
+  addarith [this]
+
+example : Transitive (· ∼ ·) := by
+  dsimp [Transitive]
+  intro (x1, y1) (x2, y2) (x3, y3) h12 h23
+  addarith [h12, h23]
 
 end
-
 
 section
 local infix:50 "∼" => fun ((a, b) : ℤ × ℤ) (c, d) ↦
   ∃ m n, m > 0 ∧ n > 0 ∧ m * b * (b ^ 2 - 3 * a ^ 2) = n * d * (d ^ 2 - 3 * c ^ 2)
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro (x, y)
+  dsimp
+  use 1, 1
+  constructor
+  · numbers
+  · constructor
+    · numbers
+    · ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro (x1, y1) (x2, y2) ⟨m, n, hm, hn, hmn⟩
+  use n, m
+  dsimp at *
+  constructor
+  · apply hn
+  · constructor
+    · apply hm
+    · rw [hmn]
 
 example : Transitive (· ∼ ·) := by
+  dsimp [Transitive]
+  intro (x1, y1) (x2, y2) (x3, y3) ⟨m1, n1, hm1, hn1, hmn1⟩ ⟨m2, n2, hm2, hn2, hmn2⟩
+  dsimp at *
   sorry
 
 end
