@@ -272,6 +272,16 @@ example : Transitive (· ∼ ·) := by
   dsimp [Transitive]
   intro (x1, y1) (x2, y2) (x3, y3) ⟨m1, n1, hm1, hn1, hmn1⟩ ⟨m2, n2, hm2, hn2, hmn2⟩
   dsimp at *
-  sorry
+  use m1 * m2, n1 * n2
+  constructor
+  · extra
+  · constructor
+    · extra
+    · calc m1 * m2 * y1 * (y1 ^ 2 - 3 * x1 ^ 2)
+          = m2 * (m1 * y1 * (y1 ^ 2 - 3 * x1 ^ 2)) := by ring
+        _ = m2 * (n1 * y2 * (y2 ^ 2 - 3 * x2 ^ 2)) := by rw [hmn1]
+        _ = n1 * (m2 * y2 * (y2 ^ 2 - 3 * x2 ^ 2)) := by ring
+        _ = n1 * (n2 * y3 * (y3 ^ 2 - 3 * x3 ^ 2)) := by rw [hmn2]
+        _ = n1 * n2 * y3 * (y3 ^ 2 - 3 * x3 ^2) := by ring
 
 end
