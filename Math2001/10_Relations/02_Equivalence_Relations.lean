@@ -161,8 +161,8 @@ example : Transitive (· ∼ ·) := by
     · apply hf1b
 
 end
-/-! # Exercises -/
 
+/-! # Exercises -/
 
 section
 local infix:50 "∼" => fun (a b : ℤ) ↦ ∃ m n, m > 0 ∧ n > 0 ∧ a * m = b * n
